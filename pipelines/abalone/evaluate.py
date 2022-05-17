@@ -7,7 +7,6 @@ import tarfile
 
 import numpy as np
 import pandas as pd
-import xgboost
 
 from sklearn.metrics import mean_squared_error
 from joblib import dump, load
