@@ -39,7 +39,7 @@ if __name__ == "__main__":
     predictions = model.predict(df)
 
     logger.debug("Calculating mean squared error.")
-    mse = sklearn.metrics.mean_squared_error(y_test, predictions)
+    mse = mean_squared_error(y_test, predictions)
     rmse = sqrt(mse)
 
     std = np.std(y_test - predictions)
