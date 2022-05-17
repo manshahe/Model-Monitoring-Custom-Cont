@@ -10,6 +10,7 @@ import pandas as pd
 import xgboost
 
 from sklearn.metrics import mean_squared_error
+from joblib import dump, load
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -24,27 +25,33 @@ if __name__ == "__main__":
         tar.extractall(path=".")
 
     logger.debug("Loading xgboost model.")
-    model = pickle.load(open("xgboost-model", "rb"))
+    model = load("model.joblib")
 
     logger.debug("Reading test data.")
     test_path = "/opt/ml/processing/test/test.csv"
-    df = pd.read_csv(test_path, header=None)
+    df = pd.read_csv(test_path, header=None, delimiter=",")
 
     logger.debug("Reading test data.")
-    y_test = df.iloc[:, 0].to_numpy()
-    df.drop(df.columns[0], axis=1, inplace=True)
-    X_test = xgboost.DMatrix(df.values)
+    y_test = df.iloc[:, 3].to_numpy()
+    df.drop(df.columns[4], axis=1, inplace=True)
+    #X_test = xgboost.DMatrix(df.values)
 
     logger.info("Performing predictions against test data.")
-    predictions = model.predict(X_test)
+    predictions = model.predict(df)
 
     logger.debug("Calculating mean squared error.")
-    mse = mean_squared_error(y_test, predictions)
+    mse = sklearn.metrics.mean_squared_error(y_test, predictions)
+    rmse = sqrt(mse)
+
     std = np.std(y_test - predictions)
     report_dict = {
         "regression_metrics": {
             "mse": {
                 "value": mse,
+                "standard_deviation": std
+            },
+            "rmse": {
+                "value": rmse,
                 "standard_deviation": std
             },
         },
