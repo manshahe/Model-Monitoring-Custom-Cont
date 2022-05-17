@@ -649,7 +649,7 @@ def get_pipeline(
 
     step_register = RegisterModel(
         name="RegisterAbaloneModel",
-        estimator=xgb_train,
+        estimator=sklearn,
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         content_types=["text/csv"],
         response_types=["text/csv"],
