@@ -299,7 +299,7 @@ def get_pipeline(
     model_path = f"s3://{default_bucket}/{base_job_prefix}/AbaloneTrain"
     image_uri = sagemaker.image_uris.retrieve(
         framework="sklearn",
-        region="eu-west-1",
+        region="eu-central-1",
         version="0.23-1",
         py_version="py3",
         instance_type="ml.m5.xlarge",
