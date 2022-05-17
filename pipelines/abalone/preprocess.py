@@ -21,36 +21,36 @@ logger.addHandler(logging.StreamHandler())
 
 
 # Since we get a headerless CSV file we specify the column names here.
-feature_columns_names = [
-    "sex",
-    "length",
-    "diameter",
-    "height",
-    "whole_weight",
-    "shucked_weight",
-    "viscera_weight",
-    "shell_weight",
-]
-label_column = "rings"
+#feature_columns_names = [
+#    "sex",
+#    "length",
+#    "diameter",
+#    "height",
+#    "whole_weight",
+#    "shucked_weight",
+#    "viscera_weight",
+#    "shell_weight",
+#]
+#label_column = "rings"
 
-feature_columns_dtype = {
-    "sex": str,
-    "length": np.float64,
-    "diameter": np.float64,
-    "height": np.float64,
-    "whole_weight": np.float64,
-    "shucked_weight": np.float64,
-    "viscera_weight": np.float64,
-    "shell_weight": np.float64,
-}
-label_column_dtype = {"rings": np.float64}
+#feature_columns_dtype = {
+#    "sex": str,
+#    "length": np.float64,
+#    "diameter": np.float64,
+#    "height": np.float64,
+#    "whole_weight": np.float64,
+#    "shucked_weight": np.float64,
+#    "viscera_weight": np.float64,
+#    "shell_weight": np.float64,
+#}
+#label_column_dtype = {"rings": np.float64}
 
 
-def merge_two_dicts(x, y):
-    """Merges two dicts, returning a new copy."""
-    z = x.copy()
-    z.update(y)
-    return z
+#def merge_two_dicts(x, y):
+#    """Merges two dicts, returning a new copy."""
+#    z = x.copy()
+#    z.update(y)
+#    return z
 
 
 if __name__ == "__main__":
@@ -66,50 +66,22 @@ if __name__ == "__main__":
     key = "/".join(input_data.split("/")[3:])
 
     logger.info("Downloading data from bucket: %s, key: %s", bucket, key)
-    fn = f"{base_dir}/data/abalone-dataset.csv"
+    fn = f"{base_dir}/data/iris-dataset.csv"
     s3 = boto3.resource("s3")
     s3.Bucket(bucket).download_file(key, fn)
 
     logger.debug("Reading downloaded data.")
-    df = pd.read_csv(
-        fn,
-        header=None,
-        names=feature_columns_names + [label_column],
-        dtype=merge_two_dicts(feature_columns_dtype, label_column_dtype),
-    )
-    os.unlink(fn)
 
-    logger.debug("Defining transformers.")
-    numeric_features = list(feature_columns_names)
-    numeric_features.remove("sex")
-    numeric_transformer = Pipeline(
-        steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
-    )
-
-    categorical_features = ["sex"]
-    categorical_transformer = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-            ("onehot", OneHotEncoder(handle_unknown="ignore")),
-        ]
-    )
-
-    preprocess = ColumnTransformer(
-        transformers=[
-            ("num", numeric_transformer, numeric_features),
-            ("cat", categorical_transformer, categorical_features),
-        ]
-    )
+    df_iris = pd.read_csv(f"{base_dir}/data/iris-dataset.csv", header=None)
+    df_iris[4] = df_iris[4].map({"Iris-setosa": 0, "Iris-versicolor": 1, "Iris-virginica": 2})
+    df = df_iris[[4, 0, 1, 2, 3]]
 
     logger.info("Applying transforms.")
-    y = df.pop("rings")
-    X_pre = preprocess.fit_transform(df)
+    y = df.pop(0)
+    X_pre = df[[1, 2, 3, 4]]
     y_pre = y.to_numpy().reshape(len(y), 1)
 
     X = np.concatenate((y_pre, X_pre), axis=1)
-
-    logger.info("Splitting %d rows of data into train, validation, test datasets.", len(X))
-    np.random.shuffle(X)
     train, validation, test = np.split(X, [int(0.7 * len(X)), int(0.85 * len(X))])
 
     logger.info("Writing out datasets to %s.", base_dir)

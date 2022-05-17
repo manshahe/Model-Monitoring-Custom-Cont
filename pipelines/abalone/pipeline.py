@@ -166,7 +166,7 @@ def get_pipeline(
     )
     input_data = ParameterString(
         name="InputDataUrl",
-        default_value=f"s3://sagemaker-servicecatalog-seedcode-{region}/dataset/abalone-dataset.csv",
+        default_value=f"s3://sagemaker-sample-files/datasets/tabular/iris/iris.data",
     )
 
     # for data quality check step
