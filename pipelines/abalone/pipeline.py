@@ -77,7 +77,10 @@ from sagemaker.clarify import (
     ModelConfig
 )
 
+from sagemaker.sklearn.estimator import SKLearn
+
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+FRAMEWORK_VERSION = "0.23-1"
 
 def get_sagemaker_client(region):
      """Gets the sagemaker client.
@@ -276,7 +279,7 @@ def get_pipeline(
 
     # We are using this bias config to configure clarify to detect bias based on the first feature in the featurized vector for Sex
     data_bias_config = BiasConfig(
-        label_values_or_threshold=[15.0], facet_name=[8], facet_values_or_threshold=[[0.5]]
+        label_values_or_threshold=[15.0], facet_name=[1], facet_values_or_threshold=[[0.5]]
     )
 
     data_bias_check_config = DataBiasCheckConfig(
@@ -295,38 +298,50 @@ def get_pipeline(
 
     model_path = f"s3://{default_bucket}/{base_job_prefix}/AbaloneTrain"
     image_uri = sagemaker.image_uris.retrieve(
-        framework="xgboost",
-        region=region,
-        version="1.0-1",
+        framework="sklearn",
+        region="eu-west-1",
+        version="0.23-1",
         py_version="py3",
-        instance_type=training_instance_type,
+        instance_type="ml.m5.xlarge",
     )
 
-    xgb_train = Estimator(
-        image_uri=image_uri,
-        instance_type=training_instance_type,
-        instance_count=1,
-        output_path=model_path,
-        base_job_name=f"{base_job_prefix}/abalone-train",
-        sagemaker_session=sagemaker_session,
+#    xgb_train = Estimator(
+#        image_uri=image_uri,
+#        instance_type=training_instance_type,
+#        instance_count=1,
+#        output_path=model_path,
+#        base_job_name=f"{base_job_prefix}/abalone-train",
+#        sagemaker_session=sagemaker_session,
+#        role=role,
+#    )
+
+#    xgb_train.set_hyperparameters(
+#        objective="reg:linear",
+#        num_round=50,
+#        max_depth=5,
+#        eta=0.2,
+#        gamma=4,
+#        min_child_weight=6,
+#        subsample=0.7,
+#        silent=0,
+#    )
+
+    
+    script_path = "train.py"
+
+    sklearn = SKLearn(
+        entry_point=os.path.join(BASE_DIR, "train.py"),
+        framework_version=FRAMEWORK_VERSION,
+        instance_type="ml.m5.xlarge",
         role=role,
-    )
-
-    xgb_train.set_hyperparameters(
-        objective="reg:linear",
-        num_round=50,
-        max_depth=5,
-        eta=0.2,
-        gamma=4,
-        min_child_weight=6,
-        subsample=0.7,
-        silent=0,
+        sagemaker_session=sagemaker_session,
+        hyperparameters={"max_leaf_nodes": 30},
     )
 
     step_train = TrainingStep(
         name="TrainAbaloneModel",
         depends_on=["DataQualityCheckStep", "DataBiasCheckStep"],
-        estimator=xgb_train,
+        estimator=sklearn,
         inputs={
             "train": TrainingInput(
                 s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
