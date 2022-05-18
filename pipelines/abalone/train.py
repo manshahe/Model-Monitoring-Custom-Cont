@@ -1,11 +1,26 @@
 from __future__ import print_function
 
-import argparse
-import joblib
+from sklearn import tree
+import time
+import sys
+from io import StringIO
 import os
+import shutil
+
+import argparse
+import csv
+import json
+import joblib
+import numpy as np
 import pandas as pd
 
-from sklearn import tree
+from sklearn.compose import ColumnTransformer, make_column_selector
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import Binarizer, StandardScaler, OneHotEncoder
+
+from sagemaker_containers.beta.framework import (
+    content_types, encoders, env, modules, transformer, worker)
 
 
 if __name__ == '__main__':
@@ -47,6 +62,52 @@ if __name__ == '__main__':
     # Print the coefficients of the trained classifier, and save the coefficients
     joblib.dump(clf, os.path.join(args.model_dir, "model.joblib"))
 
+def input_fn(input_data, content_type):
+    """Parse input data payload
+    We currently only take csv input. Since we need to process both labelled
+    and unlabelled data we first determine whether the label column is present
+    by looking at how many columns were provided.
+    """
+    print("Content Type ", content_type)
+    print("Type ", type(input_data))
+    print("Input Data ", input_data)
+    if content_type == "text/csv":
+        # Read the raw input data as CSV.
+        df = pd.read_csv(StringIO(input_data), header=None)
+        return df
+    else:
+        raise ValueError("{} not supported by script!".format(content_type))
+
+
+def output_fn(prediction, accept):
+    """Format prediction output
+    The default accept/content-type between containers for serial inference is JSON.
+    We also want to set the ContentType or mimetype as the same value as accept so the next
+    container can read the response payload correctly.
+    """
+    if accept == "application/json":
+        instances = []
+        for row in prediction.tolist():
+            instances.append({"class": row})
+
+        json_output = {"instances": instances}
+
+        return worker.Response(json.dumps(json_output), mimetype=accept)
+    elif accept == "text/csv":
+        return worker.Response(encoders.encode(prediction, accept), mimetype=accept)
+    else:
+        raise RuntimeException("{} accept type is not supported by this script.".format(accept))
+
+
+def predict_fn(input_data, model):
+    """Preprocess input data
+    We implement this because the default predict_fn uses .predict(), but our model is a preprocessor
+    so we want to use .transform().
+    The output is returned in the following order:
+        rest of features either one hot encoded or standardized
+    """
+    features = model.predict(input_data)
+    return features
 
 def model_fn(model_dir):
     """Deserialized and return fitted model

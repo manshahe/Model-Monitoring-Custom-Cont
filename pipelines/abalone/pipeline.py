@@ -35,6 +35,7 @@ from sagemaker.processing import (
     ScriptProcessor,
 )
 from sagemaker.sklearn.processing import SKLearnProcessor
+from sagemaker.sklearn.model import SKLearnModel
 from sagemaker.workflow.conditions import ConditionLessThanOrEqualTo
 from sagemaker.workflow.condition_step import (
     ConditionStep,
@@ -138,8 +139,8 @@ def get_pipeline(
     role=None,
     default_bucket=None,
     model_package_group_name="AbalonePackageGroup",
-    pipeline_name="AbalonePipeline",
-    base_job_prefix="Abalone",
+    pipeline_name="ScikitLearnPipeline",
+    base_job_prefix="ScikitLearn",
 ):
     """Gets a SageMaker ML Pipeline instance working with on abalone data.
 
@@ -210,7 +211,7 @@ def get_pipeline(
     )
 
     step_process = ProcessingStep(
-        name="PreprocessAbaloneData",
+        name="PreprocessData",
         processor=sklearn_processor,
         outputs=[
             ProcessingOutput(output_name="train", source="/opt/ml/processing/train"),
@@ -331,6 +332,7 @@ def get_pipeline(
 
     sklearn = SKLearn(
         entry_point=os.path.join(BASE_DIR, "train.py"),
+        source_dir=BASE_DIR,
         framework_version=FRAMEWORK_VERSION,
         instance_type="ml.m5.xlarge",
         role=role,
@@ -339,7 +341,7 @@ def get_pipeline(
     )
 
     step_train = TrainingStep(
-        name="TrainAbaloneModel",
+        name="TrainModel",
         depends_on=["DataQualityCheckStep", "DataBiasCheckStep"],
         estimator=sklearn,
         inputs={
@@ -366,12 +368,12 @@ def get_pipeline(
     )
 
     inputs = CreateModelInput(
-        instance_type="ml.m5.large",
-        accelerator_type="ml.eia1.medium",
+        instance_type="ml.m5.large"
+        #accelerator_type="ml.eia1.medium",
     )
 
     step_create_model = CreateModelStep(
-        name="AbaloneCreateModel",
+        name="CreateModel",
         model=model,
         inputs=inputs,
     )
@@ -389,7 +391,7 @@ def get_pipeline(
     # The output format is `prediction, original label`
 
     step_transform = TransformStep(
-        name="AbaloneTransform",
+        name="Transform",
         transformer=transformer,
         inputs=TransformInput(
             data=step_process.properties.ProcessingOutputConfig.Outputs["test"].S3Output.S3Uri,
@@ -526,12 +528,12 @@ def get_pipeline(
         role=role,
     )
     evaluation_report = PropertyFile(
-        name="AbaloneEvaluationReport",
+        name="EvaluationReport",
         output_name="evaluation",
         path="evaluation.json",
     )
     step_eval = ProcessingStep(
-        name="EvaluateAbaloneModel",
+        name="EvaluateModel",
         processor=script_eval,
         inputs=[
             ProcessingInput(
@@ -647,10 +649,20 @@ def get_pipeline(
     # the newly calculated baselines. In some cases, users may retain an older version of the baseline file to be used
     # for drift checks and not register new baselines that are calculated in the Pipeline run.
 
-    step_register = RegisterModel(
-        name="RegisterAbaloneModel",
-        estimator=sklearn,
+    sklearn_model = SKLearnModel(
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
+        role=role,
+        sagemaker_session=sagemaker_session,
+        entry_point=entry_point=os.path.join(BASE_DIR, "train.py"),
+        framework_version=FRAMEWORK_VERSION
+    
+    )
+    
+    step_register = RegisterModel(
+        name="RegisterModel",
+        model=sklearn_model,
+        #estimator=sklearn,
+        #model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         content_types=["text/csv"],
         response_types=["text/csv"],
         inference_instances=["ml.t2.medium", "ml.m5.large"],
@@ -671,7 +683,7 @@ def get_pipeline(
         right=6.0,
     )
     step_cond = ConditionStep(
-        name="CheckMSEAbaloneEvaluation",
+        name="CheckMSEEvaluation",
         conditions=[cond_lte],
         if_steps=[step_register],
         else_steps=[],
