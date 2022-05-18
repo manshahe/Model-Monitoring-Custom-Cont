@@ -568,6 +568,12 @@ def get_pipeline(
             s3_uri=data_bias_check_step.properties.CalculatedBaselineConstraints,
             content_type="application/json",
         ),
+        model_statistics=MetricsSource(
+            s3_uri="{}/evaluation.json".format(
+                step_eval.arguments["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
+            ),
+            content_type="application/json",
+        )
         #model_statistics=MetricsSource(
         #    s3_uri=model_quality_check_step.properties.CalculatedBaselineStatistics,
         #    content_type="application/json",
