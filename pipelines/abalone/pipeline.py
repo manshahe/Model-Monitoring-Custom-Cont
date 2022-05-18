@@ -334,7 +334,7 @@ def get_pipeline(
 
     sklearn = SKLearn(
         entry_point=os.path.join(BASE_DIR, "train.py"),
-        source_dir=BASE_DIR,
+        #source_dir=BASE_DIR,
         framework_version=FRAMEWORK_VERSION,
         instance_type="ml.m5.xlarge",
         role=role,
