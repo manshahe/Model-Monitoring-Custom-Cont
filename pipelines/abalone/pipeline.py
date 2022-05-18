@@ -629,7 +629,7 @@ def get_pipeline(
         #    s3_uri=model_explainability_check_config.monitoring_analysis_config_uri,
         #    content_type="application/json",
         #)
-    )
+    #)
 
     ### Register the model
 
