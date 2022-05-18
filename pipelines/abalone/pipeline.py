@@ -328,6 +328,8 @@ def get_pipeline(
 #    )
 
     
+    print("Base Directory ", BASE_DIR)
+    print("Entry Point ", os.path.join(BASE_DIR, "train.py"))
     script_path = "train.py"
 
     sklearn = SKLearn(
