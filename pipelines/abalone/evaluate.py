@@ -10,6 +10,7 @@ import pandas as pd
 
 from sklearn.metrics import mean_squared_error
 from joblib import dump, load
+from math import sqrt
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
