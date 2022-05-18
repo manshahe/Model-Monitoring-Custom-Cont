@@ -430,7 +430,6 @@ def get_pipeline(
     #    supplied_baseline_statistics=supplied_baseline_statistics_model_quality,
     #    supplied_baseline_constraints=supplied_baseline_constraints_model_quality,
     #    model_package_group_name=model_package_group_name
-    #)
 
     ### Check for Model Bias
 
@@ -455,26 +454,26 @@ def get_pipeline(
     #)
 
     # We are using this bias config to configure clarify to detect bias based on the first feature in the featurized vector for Sex
-    model_bias_config = BiasConfig(
-        label_values_or_threshold=[15.0], facet_name=[1], facet_values_or_threshold=[[0.5]]
-    )
+    #model_bias_config = BiasConfig(
+    #    label_values_or_threshold=[15.0], facet_name=[1], facet_values_or_threshold=[[0.5]]
+    #)
 
-    model_bias_check_config = ModelBiasCheckConfig(
-        data_config=model_bias_data_config,
-        data_bias_config=model_bias_config,
-        model_config=model_config,
-        model_predicted_label_config=ModelPredictedLabelConfig()
-    )
+    #model_bias_check_config = ModelBiasCheckConfig(
+    #    data_config=model_bias_data_config,
+    #    data_bias_config=model_bias_config,
+    #    model_config=model_config,
+    #    model_predicted_label_config=ModelPredictedLabelConfig()
+    #)
 
-    model_bias_check_step = ClarifyCheckStep(
-        name="ModelBiasCheckStep",
-        clarify_check_config=model_bias_check_config,
-        check_job_config=check_job_config,
-        skip_check=skip_check_model_bias,
-        register_new_baseline=register_new_baseline_model_bias,
-        supplied_baseline_constraints=supplied_baseline_constraints_model_bias,
-        model_package_group_name=model_package_group_name
-    )
+    #model_bias_check_step = ClarifyCheckStep(
+    #    name="ModelBiasCheckStep",
+    #    clarify_check_config=model_bias_check_config,
+    #    check_job_config=check_job_config,
+    #    skip_check=skip_check_model_bias,
+    #    register_new_baseline=register_new_baseline_model_bias,
+    #    supplied_baseline_constraints=supplied_baseline_constraints_model_bias,
+    #    model_package_group_name=model_package_group_name
+    #)
 
     ### Check Model Explainability
 
