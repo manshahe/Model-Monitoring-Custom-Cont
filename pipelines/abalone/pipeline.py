@@ -592,23 +592,23 @@ def get_pipeline(
         #)
     )
 
-    drift_check_baselines = DriftCheckBaselines(
-        model_data_statistics=MetricsSource(
-            s3_uri=data_quality_check_step.properties.BaselineUsedForDriftCheckStatistics,
-            content_type="application/json",
-        ),
-        model_data_constraints=MetricsSource(
-            s3_uri=data_quality_check_step.properties.BaselineUsedForDriftCheckConstraints,
-            content_type="application/json",
-        ),
-        bias_pre_training_constraints=MetricsSource(
-            s3_uri=data_bias_check_step.properties.BaselineUsedForDriftCheckConstraints,
-            content_type="application/json",
-        ),
-        bias_config_file=FileSource(
-            s3_uri=model_bias_check_config.monitoring_analysis_config_uri,
-            content_type="application/json",
-        ),
+    #drift_check_baselines = DriftCheckBaselines(
+    #    model_data_statistics=MetricsSource(
+    #        s3_uri=data_quality_check_step.properties.BaselineUsedForDriftCheckStatistics,
+    #        content_type="application/json",
+    #    ),
+    #    model_data_constraints=MetricsSource(
+    #        s3_uri=data_quality_check_step.properties.BaselineUsedForDriftCheckConstraints,
+    #        content_type="application/json",
+    #    ),
+    #    bias_pre_training_constraints=MetricsSource(
+    #        s3_uri=data_bias_check_step.properties.BaselineUsedForDriftCheckConstraints,
+    #        content_type="application/json",
+    #    ),
+    #    bias_config_file=FileSource(
+    #        s3_uri=model_bias_check_config.monitoring_analysis_config_uri,
+    #        content_type="application/json",
+    #    ),
         #model_statistics=MetricsSource(
         #    s3_uri=model_quality_check_step.properties.BaselineUsedForDriftCheckStatistics,
         #    content_type="application/json",
