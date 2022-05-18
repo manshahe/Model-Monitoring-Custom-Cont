@@ -653,9 +653,8 @@ def get_pipeline(
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         role=role,
         sagemaker_session=sagemaker_session,
-        entry_point=entry_point=os.path.join(BASE_DIR, "train.py"),
+        entry_point=os.path.join(BASE_DIR, "train.py"),
         framework_version=FRAMEWORK_VERSION
-    
     )
     
     step_register = RegisterModel(
