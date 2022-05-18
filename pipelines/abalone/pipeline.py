@@ -374,35 +374,35 @@ def get_pipeline(
         #accelerator_type="ml.eia1.medium",
     )
 
-    step_create_model = CreateModelStep(
-        name="CreateModel",
-        model=model,
-        inputs=inputs,
-    )
+    #step_create_model = CreateModelStep(
+    #    name="CreateModel",
+    #    model=model,
+    #    inputs=inputs,
+    #)
 
-    transformer = Transformer(
-        model_name=step_create_model.properties.ModelName,
-        instance_type="ml.m5.xlarge",
-        instance_count=1,
-        accept="text/csv",
-        assemble_with="Line",
-        output_path=f"s3://{default_bucket}/AbaloneTransform",
-    )
+    #transformer = Transformer(
+    #    model_name=step_create_model.properties.ModelName,
+    #    instance_type="ml.m5.xlarge",
+    #    instance_count=1,
+    #    accept="text/csv",
+    #    assemble_with="Line",
+    #    output_path=f"s3://{default_bucket}/AbaloneTransform",
+    #)
 
     # The output of the transform step combines the prediction and the input label.
     # The output format is `prediction, original label`
 
-    step_transform = TransformStep(
-        name="Transform",
-        transformer=transformer,
-        inputs=TransformInput(
-            data=step_process.properties.ProcessingOutputConfig.Outputs["test"].S3Output.S3Uri,
-            input_filter="$[1:]",
-            join_source="Input",
-            output_filter="$[0,-1]",
-            content_type="text/csv",
-            split_type="Line")
-    )
+    #step_transform = TransformStep(
+    #    name="Transform",
+    #    transformer=transformer,
+    #    inputs=TransformInput(
+    #        data=step_process.properties.ProcessingOutputConfig.Outputs["test"].S3Output.S3Uri,
+    #        input_filter="$[1:]",
+    #        join_source="Input",
+    #        output_filter="$[0,-1]",
+    #        content_type="text/csv",
+    #        split_type="Line")
+    #)
 
     ### Check the Model Quality
 
@@ -448,11 +448,11 @@ def get_pipeline(
         dataset_type="text/csv",
     )
 
-    model_config = ModelConfig(
-        model_name=step_create_model.properties.ModelName,
-        instance_count=1,
-        instance_type='ml.m5.xlarge',
-    )
+    #model_config = ModelConfig(
+    #    model_name=step_create_model.properties.ModelName,
+    #    instance_count=1,
+    #    instance_type='ml.m5.xlarge',
+    #)
 
     # We are using this bias config to configure clarify to detect bias based on the first feature in the featurized vector for Sex
     model_bias_config = BiasConfig(
@@ -726,7 +726,7 @@ def get_pipeline(
                data_quality_check_step, 
                data_bias_check_step, 
                step_train, 
-               step_create_model, 
+               #step_create_model, 
                #step_transform, 
                #model_quality_check_step, 
                #model_bias_check_step, 
