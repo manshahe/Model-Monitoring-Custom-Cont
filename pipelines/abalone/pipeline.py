@@ -586,7 +586,7 @@ def get_pipeline(
             # with both pre-training and post-training bias metrics
             s3_uri=model_bias_check_step.properties.CalculatedBaselineConstraints,
             content_type="application/json",
-        )#,
+        ),
         #explainability=MetricsSource(
         #    s3_uri=model_explainability_check_step.properties.CalculatedBaselineConstraints,
         #    content_type="application/json",
@@ -621,7 +621,7 @@ def get_pipeline(
         bias_post_training_constraints=MetricsSource(
             s3_uri=model_bias_check_step.properties.BaselineUsedForDriftCheckConstraints,
             content_type="application/json",
-        )#,
+        ),
         #explainability_constraints=MetricsSource(
         #    s3_uri=model_explainability_check_step.properties.BaselineUsedForDriftCheckConstraints,
         #    content_type="application/json",
