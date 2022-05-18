@@ -412,25 +412,25 @@ def get_pipeline(
     # which represent the input and output. Since the dataset has no headers, `_c0`, `_c1` are auto-generated
     # header names that should be used in the `ModelQualityCheckConfig`.
 
-    model_quality_check_config = ModelQualityCheckConfig(
-        baseline_dataset=step_transform.properties.TransformOutput.S3OutputPath,
-        dataset_format=DatasetFormat.csv(header=False),
-        output_s3_uri=Join(on='/', values=['s3:/', default_bucket, base_job_prefix, ExecutionVariables.PIPELINE_EXECUTION_ID, 'modelqualitycheckstep']),
-        problem_type='Regression',
-        inference_attribute='_c0',
-        ground_truth_attribute='_c1'
-    )
+    #model_quality_check_config = ModelQualityCheckConfig(
+    #    baseline_dataset=step_transform.properties.TransformOutput.S3OutputPath,
+    #    dataset_format=DatasetFormat.csv(header=False),
+    #    output_s3_uri=Join(on='/', values=['s3:/', default_bucket, base_job_prefix, ExecutionVariables.PIPELINE_EXECUTION_ID, 'modelqualitycheckstep']),
+    #    problem_type='Regression',
+    #    inference_attribute='_c0',
+    #    ground_truth_attribute='_c1'
+    #)
 
-    model_quality_check_step = QualityCheckStep(
-        name="ModelQualityCheckStep",
-        skip_check=skip_check_model_quality,
-        register_new_baseline=register_new_baseline_model_quality,
-        quality_check_config=model_quality_check_config,
-        check_job_config=check_job_config,
-        supplied_baseline_statistics=supplied_baseline_statistics_model_quality,
-        supplied_baseline_constraints=supplied_baseline_constraints_model_quality,
-        model_package_group_name=model_package_group_name
-    )
+    #model_quality_check_step = QualityCheckStep(
+    #    name="ModelQualityCheckStep",
+    #    skip_check=skip_check_model_quality,
+    #    register_new_baseline=register_new_baseline_model_quality,
+    #    quality_check_config=model_quality_check_config,
+    #    check_job_config=check_job_config,
+    #    supplied_baseline_statistics=supplied_baseline_statistics_model_quality,
+    #    supplied_baseline_constraints=supplied_baseline_constraints_model_quality,
+    #    model_package_group_name=model_package_group_name
+    #)
 
     ### Check for Model Bias
 
