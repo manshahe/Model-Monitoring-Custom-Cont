@@ -11,10 +11,42 @@ phases:
     commands:
       - export PYTHONUNBUFFERED=TRUE
       - export SAGEMAKER_PROJECT_NAME_ID="${SAGEMAKER_PROJECT_NAME}-${SAGEMAKER_PROJECT_ID}"
+      #Build our own Scikit-Learn container
+      - export algorithm_name=sagemaker-decision-trees
+      - cd container
+
+      - account=$(aws sts get-caller-identity --query Account --output text)
+
+        # Get the region defined in the current configuration (default to us-west-2 if none defined)
+      - region=$(aws configure get region)
+      - region=${region:-us-west-2}
+
+      - fullname="${account}.dkr.ecr.${region}.amazonaws.com/${algorithm_name}:latest"
+
+        # If the repository doesn't exist in ECR, create it.
+      - aws ecr describe-repositories --repository-names "${algorithm_name}" > /dev/null 2>&1
       - |
-        run-pipeline --module-name pipelines.abalone.pipeline \
-          --role-arn $SAGEMAKER_PIPELINE_ROLE_ARN \
-          --tags "[{\"Key\":\"sagemaker:project-name\", \"Value\":\"${SAGEMAKER_PROJECT_NAME}\"}, {\"Key\":\"sagemaker:project-id\", \"Value\":\"${SAGEMAKER_PROJECT_ID}\"}]" \
-          --kwargs "{\"region\":\"${AWS_REGION}\",\"sagemaker_project_arn\":\"${SAGEMAKER_PROJECT_ARN}\",\"role\":\"${SAGEMAKER_PIPELINE_ROLE_ARN}\",\"default_bucket\":\"${ARTIFACT_BUCKET}\",\"pipeline_name\":\"${SAGEMAKER_PROJECT_NAME_ID}\",\"model_package_group_name\":\"${SAGEMAKER_PROJECT_NAME_ID}\",\"base_job_prefix\":\"${SAGEMAKER_PROJECT_NAME_ID}\"}"
+        if [ $? -ne 0 ] \
+        then \
+            aws ecr create-repository --repository-name "${algorithm_name}" > /dev/null \
+        fi
+
+        # Get the login command from ECR and execute it directly
+      - aws ecr get-login-password --region ${region}|docker login --username AWS --password-stdin ${fullname}
+
+        # Build the docker image locally with the image name and then push it to ECR
+        # with the full name.
+
+      - docker build  -t ${algorithm_name} .
+      - docker tag ${algorithm_name} ${fullname}
+
+      - docker push ${fullname}
+      
+      - cd ..
+      #- |
+      #  run-pipeline --module-name pipelines.abalone.pipeline \
+      #    --role-arn $SAGEMAKER_PIPELINE_ROLE_ARN \
+      #    --tags "[{\"Key\":\"sagemaker:project-name\", \"Value\":\"${SAGEMAKER_PROJECT_NAME}\"}, {\"Key\":\"sagemaker:project-id\", \"Value\":\"${SAGEMAKER_PROJECT_ID}\"}]" \
+      #    --kwargs "{\"region\":\"${AWS_REGION}\",\"sagemaker_project_arn\":\"${SAGEMAKER_PROJECT_ARN}\",\"role\":\"${SAGEMAKER_PIPELINE_ROLE_ARN}\",\"default_bucket\":\"${ARTIFACT_BUCKET}\",\"pipeline_name\":\"${SAGEMAKER_PROJECT_NAME_ID}\",\"model_package_group_name\":\"${SAGEMAKER_PROJECT_NAME_ID}\",\"base_job_prefix\":\"${SAGEMAKER_PROJECT_NAME_ID}\"}"
       - echo "Create/Update of the SageMaker Pipeline and execution completed."
 
