@@ -348,7 +348,7 @@ def get_pipeline(
         role,
         1,
         "ml.m5.xlarge",
-        output_path="s3://{}/output".format(sess.default_bucket()),
+        output_path="s3://sagemaker-project-p-tf0ciq58eymc/",
         sagemaker_session=sagemaker_session
     )
 
