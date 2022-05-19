@@ -349,7 +349,7 @@ def get_pipeline(
         1,
         "ml.m5.xlarge",
         output_path="s3://{}/output".format(sess.default_bucket()),
-        sagemaker_session=sess
+        sagemaker_session=sagemaker_session
     )
 
     step_train = TrainingStep(
@@ -666,11 +666,20 @@ def get_pipeline(
     # the newly calculated baselines. In some cases, users may retain an older version of the baseline file to be used
     # for drift checks and not register new baselines that are calculated in the Pipeline run.
 
-    sklearn_model = SKLearnModel(
+    #sklearn_model = SKLearnModel(
+    #    model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
+    #    role=role,
+    #    sagemaker_session=sagemaker_session,
+    #    entry_point=os.path.join(BASE_DIR, "train.py"),
+    #    #framework_version=FRAMEWORK_VERSION
+    #    image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
+    #)
+    
+    sklearn_model = sagemaker.model.Model(
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         role=role,
         sagemaker_session=sagemaker_session,
-        entry_point=os.path.join(BASE_DIR, "train.py"),
+        #entry_point=os.path.join(BASE_DIR, "train.py"),
         #framework_version=FRAMEWORK_VERSION
         image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
     )
