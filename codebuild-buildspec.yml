@@ -1,14 +1,16 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_DEFAULT_REGION: "eu-central-1"
+
 phases:
   install:
     runtime-versions:
       python: 3.8
     commands:
       - pip install --upgrade --force-reinstall . "awscli>1.20.30"
-  shell: bash
-  variables:
-    AWS_DEFAULT_REGION: "eu-central-1"
+
   
   build:
     commands:
