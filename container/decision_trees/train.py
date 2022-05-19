@@ -39,7 +39,8 @@ def train():
             trainingParams = json.load(tc)
 
             
-        print(print(os.listdir(training_path)))
+        print(os.listdir(training_path))
+        print(os.listdir(prefix))
         # Take the set of files and read them all into a single pandas dataframe
         input_files = [ os.path.join(training_path, file) for file in os.listdir(training_path) ]
         if len(input_files) == 0:
