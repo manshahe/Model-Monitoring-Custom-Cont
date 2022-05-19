@@ -332,15 +332,24 @@ def get_pipeline(
     print("Entry Point ", os.path.join(BASE_DIR, "train.py"))
     script_path = "train.py"
 
-    sklearn = SKLearn(
-        entry_point=os.path.join(BASE_DIR, "train.py"),
-        #source_dir=BASE_DIR,
-        #framework_version=FRAMEWORK_VERSION,
-        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
-        instance_type="ml.m5.xlarge",
-        role=role,
-        sagemaker_session=sagemaker_session,
-        hyperparameters={"max_leaf_nodes": 30},
+#    sklearn = SKLearn(
+#        entry_point=os.path.join(BASE_DIR, "train.py"),
+#        #source_dir=BASE_DIR,
+#        #framework_version=FRAMEWORK_VERSION,
+#        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
+#        instance_type="ml.m5.xlarge",
+#        role=role,
+#        sagemaker_session=sagemaker_session,
+#        hyperparameters={"max_leaf_nodes": 30},
+#    )
+    
+    sklearn = sagemaker.estimator.Estimator(
+        "506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
+        role,
+        1,
+        "ml.m5.xlarge",
+        output_path="s3://{}/output".format(sess.default_bucket()),
+        sagemaker_session=sess
     )
 
     step_train = TrainingStep(
