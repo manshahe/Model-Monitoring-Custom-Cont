@@ -2,7 +2,7 @@
 # This is a Python 3 image that uses the nginx, gunicorn, flask stack
 # for serving inferences in a stable way.
 
-FROM ubuntu:18.04
+FROM public.ecr.aws/docker/library/ubuntu:18.04
 
 MAINTAINER Amazon AI <sage-learner@amazon.com>
 
@@ -34,6 +34,3 @@ ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 ENV PATH="/opt/program:${PATH}"
 
-# Set up the program in the image
-COPY decision_trees /opt/program
-WORKDIR /opt/program
