@@ -38,6 +38,8 @@ def train():
         with open(param_path, 'r') as tc:
             trainingParams = json.load(tc)
 
+            
+        print(print(os.listdir(training_path)))
         # Take the set of files and read them all into a single pandas dataframe
         input_files = [ os.path.join(training_path, file) for file in os.listdir(training_path) ]
         if len(input_files) == 0:
@@ -53,7 +55,7 @@ def train():
         train_X = train_data.iloc[:,:-1]
         
         print(train_y.dtypes)
-        print(train_x.dtypes)    
+        print(train_X.dtypes)    
 
         # Here we only support a single hyperparameter. Note that hyperparameters are always passed in as
         # strings, so we need to do any necessary conversions.
