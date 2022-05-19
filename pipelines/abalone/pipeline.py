@@ -335,7 +335,8 @@ def get_pipeline(
     sklearn = SKLearn(
         entry_point=os.path.join(BASE_DIR, "train.py"),
         #source_dir=BASE_DIR,
-        framework_version=FRAMEWORK_VERSION,
+        #framework_version=FRAMEWORK_VERSION,
+        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
         instance_type="ml.m5.xlarge",
         role=role,
         sagemaker_session=sagemaker_session,
@@ -363,7 +364,7 @@ def get_pipeline(
     )
 
     model = Model(
-        image_uri=image_uri,
+        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         sagemaker_session=sagemaker_session,
         role=role,
@@ -661,7 +662,8 @@ def get_pipeline(
         role=role,
         sagemaker_session=sagemaker_session,
         entry_point=os.path.join(BASE_DIR, "train.py"),
-        framework_version=FRAMEWORK_VERSION
+        #framework_version=FRAMEWORK_VERSION
+        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
     )
     
     step_register = RegisterModel(
