@@ -344,7 +344,7 @@ def get_pipeline(
 #    )
     
     sklearn = sagemaker.estimator.Estimator(
-        "506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
+        "506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees:latest",
         role,
         1,
         "ml.m5.xlarge",
@@ -373,7 +373,7 @@ def get_pipeline(
     )
 
     model = Model(
-        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
+        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees:latest",
         model_data=step_train.properties.ModelArtifacts.S3ModelArtifacts,
         sagemaker_session=sagemaker_session,
         role=role,
@@ -681,7 +681,7 @@ def get_pipeline(
         sagemaker_session=sagemaker_session,
         #entry_point=os.path.join(BASE_DIR, "train.py"),
         #framework_version=FRAMEWORK_VERSION
-        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees",
+        image_uri="506339749025.dkr.ecr.eu-central-1.amazonaws.com/sagemaker-decision-trees:latest",
     )
     
     step_register = RegisterModel(
