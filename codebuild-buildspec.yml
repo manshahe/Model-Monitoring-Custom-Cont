@@ -6,6 +6,9 @@ phases:
       python: 3.8
     commands:
       - pip install --upgrade --force-reinstall . "awscli>1.20.30"
+  shell: bash
+  variables:
+    AWS_DEFAULT_REGION: "eu-central-1"
   
   build:
     commands:
@@ -18,8 +21,7 @@ phases:
       - account=$(aws sts get-caller-identity --query Account --output text)
 
         # Get the region defined in the current configuration (default to us-west-2 if none defined)
-      - region=$(aws configure get region)
-      - region=${region:-eu-central-1}
+      - region=$AWS_DEFAULT_REGION
 
       - fullname="${account}.dkr.ecr.${region}.amazonaws.com/${algorithm_name}:latest"
 
