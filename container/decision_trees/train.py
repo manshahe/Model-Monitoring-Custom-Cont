@@ -9,6 +9,7 @@ from __future__ import print_function
 import json
 import os
 import pickle
+import joblib
 import sys
 import traceback
 
@@ -48,12 +49,12 @@ def train():
         train_data = pd.concat(raw_data)
 
         # labels are in the first column
-        train_y = train_data.iloc[:,0]
-        train_X = train_data.iloc[:,1:]
+        train_y = train_data.iloc[:, 4]
+        train_X = train_data.iloc[:,:-1]
 
         # Here we only support a single hyperparameter. Note that hyperparameters are always passed in as
         # strings, so we need to do any necessary conversions.
-        max_leaf_nodes = trainingParams.get('max_leaf_nodes', None)
+        max_leaf_nodes = trainingParams.get('max_leaf_nodes', 30)
         if max_leaf_nodes is not None:
             max_leaf_nodes = int(max_leaf_nodes)
 
@@ -62,8 +63,9 @@ def train():
         clf = clf.fit(train_X, train_y)
 
         # save the model
-        with open(os.path.join(model_path, 'decision-tree-model.pkl'), 'wb') as out:
-            pickle.dump(clf, out)
+        #with open(os.path.join(model_path, 'decision-tree-model.pkl'), 'wb') as out:
+        #    pickle.dump(clf, out)
+        joblib.dump(clf, os.path.join(model_path, "model.joblib"))
         print('Training complete.')
     except Exception as e:
         # Write out an error file. This will be returned as the failureReason in the

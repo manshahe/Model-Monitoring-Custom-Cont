@@ -28,8 +28,9 @@ class ScoringService(object):
     def get_model(cls):
         """Get the model object for this instance, loading it if it's not already loaded."""
         if cls.model == None:
-            with open(os.path.join(model_path, "decision-tree-model.pkl"), "rb") as inp:
-                cls.model = pickle.load(inp)
+            #with open(os.path.join(model_path, "decision-tree-model.pkl"), "rb") as inp:
+            #    cls.model = pickle.load(inp)
+            cls.model = joblib.load(os.path.join(model_path, "model.joblib"))
         return cls.model
 
     @classmethod
